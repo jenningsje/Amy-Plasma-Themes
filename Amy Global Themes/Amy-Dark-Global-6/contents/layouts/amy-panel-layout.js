@@ -1,36 +1,40 @@
-// amy-panel-layout.js (your existing panel layout script)
-var panel = new Panel
-var panelScreen = panel.screen
-var freeEdges = {"bottom": true, "top": true, "left": true, "right": true}
+// amy-panel-layout.js — minimal working panel layout
 
-for (i = 0; i < panelIds.length; ++i) {
-    var tmpPanel = panelById(panelIds[i])
+var panelIds = panels();
+var panel = new Panel;
+var panelScreen = panel.screen;
+
+// Track which edges are free
+var freeEdges = {"bottom": true, "top": true, "left": true, "right": true};
+
+for (var i = 0; i < panelIds.length; ++i) {
+    var tmpPanel = panelById(panelIds[i]);
     if (tmpPanel.screen == panelScreen) {
-        // Ignore the new panel
+        // Ignore the new panel itself
         if (tmpPanel.id != panel.id) {
             freeEdges[tmpPanel.location] = false;
         }
     }
 }
 
-if (freeEdges["bottom"] == true) {
+// Place panel on first free edge: bottom, top, left, right (in that order)
+if (freeEdges["bottom"]) {
     panel.location = "bottom";
-} else if (freeEdges["top"] == true) {
+} else if (freeEdges["top"]) {
     panel.location = "top";
-} else if (freeEdges["left"] == true) {
+} else if (freeEdges["left"]) {
     panel.location = "left";
-} else if (freeEdges["right"] == true) {
+} else if (freeEdges["right"]) {
     panel.location = "right";
 } else {
-    // There is no free edge, so leave the default value
+    // fallback
     panel.location = "top";
 }
-// For an Icons-Only Task Manager on the bottom, *3 is too much, *2 is too little
-// Round down to next highest even number since the Panel size widget only displays
-// even numbers
-panel.height = 2 * Math.floor(gridUnit * 2.5 / 2)
 
-// Restrict horizontal panel to a maximum size of a 21:9 monitor
+// Panel height (icons-only task manager friendly)
+panel.height = 2 * Math.floor(gridUnit * 2.5 / 2);
+
+// Limit horizontal panel max size for ultrawide monitors
 const maximumAspectRatio = 21/9;
 if (panel.formFactor === "horizontal") {
     const geo = screenGeometry(panelScreen);
@@ -43,58 +47,14 @@ if (panel.formFactor === "horizontal") {
     }
 }
 
-var kickoff = panel.addWidget("org.kde.plasma.kickoff")
-kickoff.currentConfigGroup = ["Shortcuts"]
-kickoff.writeConfig("global", "Alt+F1")
+// Add some standard widgets
+panel.addWidget("org.kde.plasma.kickoff");
+panel.addWidget("org.kde.plasma.systemtray");
+panel.addWidget("org.kde.plasma.digitalclock");
 
-//panel.addWidget("org.kde.plasma.showActivityManager")
-panel.addWidget("org.kde.plasma.pager")
-panel.addWidget("org.kde.plasma.icontasks")
-panel.addWidget("org.kde.plasma.marginsseparator")
-
-/* Next up is determining whether to add the Input Method Panel
- * widget to the panel or not. This is done based on whether
- * the system locale's language id is a member of the following
- * white list of languages which are known to pull in one of
- * our supported IME backends when chosen during installation
- * of common distributions. */
-
-var langIds = ["as",    // Assamese
-               "bn",    // Bengali
-               "bo",    // Tibetan
-               "brx",   // Bodo
-               "doi",   // Dogri
-               "gu",    // Gujarati
-               "hi",    // Hindi
-               "ja",    // Japanese
-               "kn",    // Kannada
-               "ko",    // Korean
-               "kok",   // Konkani
-               "ks",    // Kashmiri
-               "lep",   // Lepcha
-               "mai",   // Maithili
-               "ml",    // Malayalam
-               "mni",   // Manipuri
-               "mr",    // Marathi
-               "ne",    // Nepali
-               "or",    // Odia
-               "pa",    // Punjabi
-               "sa",    // Sanskrit
-               "sat",   // Santali
-               "sd",    // Sindhi
-               "si",    // Sinhala
-               "ta",    // Tamil
-               "te",    // Telugu
-               "th",    // Thai
-               "ur",    // Urdu
-               "vi",    // Vietnamese
-               "zh_CN", // Simplified Chinese
-               "zh_TW"] // Traditional Chinese
-
-if (langIds.indexOf(languageId) != -1) {
-    panel.addWidget("org.kde.plasma.kimpanel");
-}
-
-panel.addWidget("org.kde.plasma.systemtray")
-panel.addWidget("org.kde.plasma.digitalclock")
-panel.addWidget("org.kde.plasma.showdesktop")
+// Set dark translucent background on the panel
+panel.currentConfigGroup = ["Appearance"];
+panel.writeConfig("backgroundHints", 2);       // enable translucent background
+panel.writeConfig("backgroundColor", "#000000"); // black
+panel.writeConfig("backgroundAlpha", 0.6);     // 60% opacity
+panel.currentConfigGroup = [];
