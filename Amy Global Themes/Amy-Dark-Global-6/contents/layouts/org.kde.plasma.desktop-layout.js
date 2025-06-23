@@ -7,6 +7,6 @@ var desktopsArray = desktopsForActivity(currentActivity());
 for (var j = 0; j < desktopsArray.length; j++) {
     desktopsArray[j].wallpaperPlugin = 'org.kde.image';
     desktopsArray[j].currentConfigGroup = Array('Wallpaper', 'org.kde.image', 'General');
-    desktopsArray[j].writeConfig('Image', 'file:///usr/share/wallpapers/Next/contents/images/1440x900.jpg'); // adjust wallpaper path
+    desktopsArray[j].writeConfig('Image', '/usr/share/wallpapers/Next/contents/images/1440x900.jpg'); // adjust wallpaper path
 }
 
